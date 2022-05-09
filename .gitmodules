@@ -1,0 +1,3 @@
+[submodule "source/aarch64-hello-world"]
+	path = source/aarch64-hello-world
+	url = https://github.com/daniel-k/aarch64-hello-world
