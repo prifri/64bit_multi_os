@@ -50,5 +50,5 @@ make
 if [ "${CMD}" == "run" ]
 then
 	cd ../../
-	./run_qemu.sh ${TARGET}
+	./run_qemu.sh ${TARGET} 
 fi
