@@ -21,7 +21,6 @@ then
 	DIR=./source/"${PREFIX}""$1"
 fi
 
-echo ${DIR}
 if [ ! -d ${DIR} ]
 then
 	DIR=./source/"${PREFIX}0""$1"
@@ -43,6 +42,10 @@ fi
 
 make
 
+if [ $? -ne 0 ]
+then
+	exit 0
+fi
 ###########################
 # qemu run
 ###########################
