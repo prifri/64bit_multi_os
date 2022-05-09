@@ -3,28 +3,52 @@ then
 	echo "./build.sh dir_name"
 	echo "ex) ./build.sh chap04"
 	echo "ex) ./build.sh chap04 run"
+	echo "ex) ./build.sh chap04 clean"
 	exit 1
 fi
 
+CMD=$2
+
+###########################
+# find dir
+###########################
+
+PREFIX="chap"
 DIR=./source/"$1"
-cd ${DIR}
+
+if [ ! -d ${DIR} ]
+then
+	DIR=./source/"${PREFIX}""$1"
+fi
+
+echo ${DIR}
+if [ ! -d ${DIR} ]
+then
+	DIR=./source/"${PREFIX}0""$1"
+fi
+
+###########################
+# build or clean
+###########################
 
 TARGET=${DIR}/Disk.img
-make
 
-if [ $? -ne 0 ];
-then
-	exit 1
-fi
+cd ${DIR}
 
-if [ -z $2 ]
+if [ "${CMD}" == "clean" ]
 then
+	make clean
 	exit 0
 fi
 
-cd ../../
+make
 
-if [ "$2" == "run" ]
+###########################
+# qemu run
+###########################
+
+if [ "${CMD}" == "run" ]
 then
+	cd ../../
 	./run_qemu.sh ${TARGET}
 fi
