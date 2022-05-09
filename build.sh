@@ -1,14 +1,30 @@
-cd ./source/
+if [ -z $1 ]
+then
+	echo "./build.sh dir_name"
+	echo "ex) ./build.sh chap04"
+	echo "ex) ./build.sh chap04 run"
+	exit 1
+fi
+
+DIR=./source/"$1"
+cd ${DIR}
+
+TARGET=${DIR}/Disk.img
 make
 
-if [ -z $1]
+if [ $? -ne 0 ];
+then
+	exit 1
+fi
+
+if [ -z $2 ]
 then
 	exit 0
 fi
 
-cd ..
+cd ../../
 
-if [ "$1" == "run" ]
+if [ "$2" == "run" ]
 then
-	./run_qemu.sh
+	./run_qemu.sh ${TARGET}
 fi
