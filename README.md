@@ -37,3 +37,7 @@ sudo apt install binutils bison flex libc6-dev libtool make patchutils libgmp-de
 ```
 ./run_qemu.sh {image}
 ```
+
+# 오탈자
+
+[원작자 link](https://kkamagui.tistory.com/781)
