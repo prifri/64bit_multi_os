@@ -14,14 +14,14 @@
 // 매크로
 //
 ////////////////////////////////////////////////////////////////////////////////
-#define BYTE    unsigned char
-#define WORD    unsigned short
-#define DWORD   unsigned int
+#define uint8_t    unsigned char
+#define uint16_t    unsigned short
+#define uint32_t   unsigned int
 #define QWORD   unsigned long
-#define BOOL    unsigned char
+#define bool    unsigned char
 
-#define TRUE    1
-#define FALSE   0
+#define true    1
+#define false   0
 #define NULL    0
 
 
@@ -35,8 +35,8 @@
 // 비디오 모드 중 텍스트 모드 화면을 구성하는 자료구조
 typedef struct kCharactorStruct
 {
-    BYTE bCharactor;
-    BYTE bAttribute;
+    uint8_t bCharactor;
+    uint8_t bAttribute;
 } __packed CHARACTER;
 
 

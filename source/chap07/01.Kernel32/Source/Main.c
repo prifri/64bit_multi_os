@@ -36,6 +36,7 @@ void kPrintString( int iX, int iY, const char* pcString )
     for( i = 0 ; pcString[ i ] != 0 ; i++ )
     {
         pstScreen[ i ].bCharactor = pcString[ i ];
+		//pstScreen[i].bAttribute = 0;
     }
 }
 

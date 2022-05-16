@@ -23,4 +23,5 @@ if [[ "$1" == *"arm64"* ]];then
 fi  
 
 # https://sean.tistory.com/134?category=869595 
+#qemu-system-x86_64 -m 64 -fda ${1} -rtc base=localtime -display curses
 qemu-system-x86_64 -m 64 -fda ${1} -rtc base=localtime -M pc
