@@ -93,13 +93,13 @@ static void __main(void)
 	{
 		kPrintString(45, 4, STR_FAIL);
 		kPrintString(0, 5, "Not Enough Memory. MINT64 OS Require Over 64MB");
+		goto stop;
 	}
 	else
 	{
 		kPrintString(45, 4, STR_PASS);
 	}
 
-		//goto stop;
     kPrintString( 0, 5, "IA-32e Kernel Area Init.....................[    ]" );
 	if (!kInitializeKernel64Area())
 	{
