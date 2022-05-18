@@ -90,6 +90,42 @@ static void kPrintString( int iX, int iY, const char* pcString )
 
 #define STR_PASS	"PASS"
 #define STR_FAIL	"FAIL"
+
+static void cpuid_read(void)
+{
+	uint32_t dwEAX, dwEBX, dwECX, dwEDX;
+#define VENDOR_STR_SIZE	(sizeof(uint32_t) * 3 + 1)
+	char vcVendorString[VENDOR_STR_SIZE] = {0};
+
+/*
+ * PRIFI, 2022.05.18:
+ * - vendor stirng을 가져온다.
+ */
+#define CPUID_REG	(0)
+	// read cpuid
+	kReadCPUID(CPUID_REG, &dwEAX, &dwEBX, &dwECX, &dwEDX);
+	*((uint32_t *)vcVendorString) = dwEBX;
+	*((uint32_t *)vcVendorString + 1) = dwEDX;
+	*((uint32_t *)vcVendorString + 2) = dwECX;
+    kPrintString( 0, 7, "Processor Vendor String.....................[            ]");
+	kPrintString(45, 7, vcVendorString);
+	//*((uint32_t *)vcVendorString + 3) = dwEBX;
+	
+#define CPUID_EXT_REG	(0x80000001)
+	kReadCPUID(0x80000001, &dwEAX, &dwEBX, &dwECX, &dwEDX);
+    kPrintString( 0, 8, "64bit Mode Support Check....................[    ]");
+	if (dwEDX & ( 1 << 29))
+	{
+		kPrintString(45, 8, STR_PASS);
+	}
+	else
+	{
+		kPrintString(45, 8, STR_FAIL);
+		kPrintString(0, 9, "This processor does not support 64bit mode~!!");
+		kernel_stop();
+	}
+}
+
 static void __main(void)
 {
     kPrintString(0, 3, "C Language Kernel Started...................[PASS]");
@@ -122,6 +158,11 @@ static void __main(void)
 	kInitializePageTables();
 	kPrintString(45, 6, STR_PASS);
 
+	cpuid_read();
+
+	// IA-32e mode로 전환
+	kPrintString(0, 9, "Switch To IA-32e Mode");
+	//kSwitchAndExcute64bitKernel();
 stop:
 	kernel_stop();
 }

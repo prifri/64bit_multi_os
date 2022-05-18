@@ -54,12 +54,12 @@ mov dword [esi], ebx        ; *pdwEBX가 ptr이므로 ptr이 가리키는 어드
                             ; eax 레지스터값을 저장
 
 ; *pdwECX
-mov esi, dword [ ebp + 16 ] ; param 4(*pdwECX)를 esi register에 저장
+mov esi, dword [ ebp + 20 ] ; param 4(*pdwECX)를 esi register에 저장
 mov dword [esi], ecx        ; *pdwECX가 ptr이므로 ptr이 가리키는 어드레스에
                             ; eax 레지스터값을 저장
 
 ; *pdwEDX
-mov esi, dword [ ebp + 16 ] ; param 6(*pdwEDX)를 esi register에 저장
+mov esi, dword [ ebp + 24 ] ; param 6(*pdwEDX)를 esi register에 저장
 mov dword [esi], edx        ; *pdwEDX가 ptr이므로 ptr이 가리키는 어드레스에
                             ; eax 레지스터값을 저장
 
