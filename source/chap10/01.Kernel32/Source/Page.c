@@ -24,9 +24,6 @@ void kInitializePageTables(void)
 
 	// PML4 table 생성
 	// 첫 번째 entry 외에 나머지는 모두 0으로 초기화
-#define PML4_TABLE_ADDR	((uint32_t *)0x100000)
-#define PDPT_BASE_ADDR	((uint32_t *)0x101000)
-#define PDE_BASE_ADDR	((uint32_t *)0x102000)
 	pstPML4TEntry = (PML4ENTRY *)PML4_TABLE_ADDR;
 
 	for (i = 0; i < PML4_MAXENTRY_COUNT; i++)

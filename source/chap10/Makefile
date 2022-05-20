@@ -4,7 +4,7 @@
 # brief		OS 이미지를 빌드하기 위한 make 파일
 
 # 기본적으로 빌드를 수행할 목록
-all: BootLoader Kernel32 Utility Disk.img
+all: BootLoader Kernel32 Kernel64 Utility Disk.img
 
 # 부트 로더 빌드를 위해 부트 로더 디렉터리에서 make 실행
 BootLoader:
@@ -35,7 +35,7 @@ Kernel64:
 	@echo ============== Build 64bit Kernel ===============
 	@echo 
 	
-	make -C 01.Kernel64
+	make -C 02.Kernel64
 
 	@echo 
 	@echo =============== Build Complete ===============
@@ -49,8 +49,7 @@ Disk.img: 00.BootLoader/BootLoader.bin 01.Kernel32/Kernel32.bin 02.Kernel64/Kern
 	@echo 
 
 	#./ImageMaker.exe $^
-	./04.Utility/00.ImageMaker/ImageMaker.exe \
-		./00.BootLoader/BootLoader.bin  ./01.Kernel32/Kernel32.bin
+	./04.Utility/00.ImageMaker/ImageMaker.exe $^
 
 	@echo 
 	@echo ============= All Build Complete =============

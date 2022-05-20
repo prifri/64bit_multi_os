@@ -15,8 +15,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include "common.h"
 
-#define BYTESOFSECTOR  512
 #define O_BINARY 0
 
 // 함수 선언
@@ -125,14 +125,14 @@ int main(int argc, char* argv[])
 int AdjustInSectorSize( int iFd, int iSourceSize )
 {
     int iAdjustSizeToSector;
-    static const char zero[512];
+    static const char zero[SECTOR_SIZE];
     int iSectorCount;
 
     iAdjustSizeToSector = iSourceSize % BYTESOFSECTOR;
     
     if( iAdjustSizeToSector != 0 )
     {
-        iAdjustSizeToSector = 512 - iAdjustSizeToSector;
+        iAdjustSizeToSector = SECTOR_SIZE - iAdjustSizeToSector;
         printf( "[INFO] File size [%d] and fill [%u] byte\n", iSourceSize, 
             iAdjustSizeToSector );
 		write( iFd , zero, iAdjustSizeToSector);
@@ -161,7 +161,7 @@ void WriteKernelInformation( int iTargetFd, int iTotalKernelSectorCount,
     long lPosition;
     
     // 파일의 시작에서 5바이트 떨어진 위치가 커널의 총 섹터 수 정보를 나타냄
-    lPosition = lseek( iTargetFd, 5, SEEK_SET );
+    lPosition = lseek( iTargetFd, BOOTLOADER_TOTALSECTORCOUNT_OFFSET, SEEK_SET );
     if( lPosition == -1 )
     {
         fprintf( stderr, "lseek fail. Return value = %ld, errno = %d, %d\n", 
@@ -170,9 +170,9 @@ void WriteKernelInformation( int iTargetFd, int iTotalKernelSectorCount,
     }
 
     usData = ( unsigned short )iTotalKernelSectorCount;
-    write( iTargetFd, &usData, 2 );
+    write( iTargetFd, &usData, BOOTLOADER_TOTALSECTORCOUNT_SIZE );
     usData = ( unsigned short )iKernel32SectorCount;
-    write( iTargetFd, &usData, 2 );
+    write( iTargetFd, &usData, BOOTLOADER_KERNEL32SECTORCOUNT_SIZE );
 
     printf( "[INFO] Total sector count except boot loader [%d]\n", 
         iTotalKernelSectorCount );

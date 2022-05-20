@@ -1,7 +1,7 @@
 [BITS 32] ; 32bit code 라는것을 알림.
 
 ; C 언어에서 호출할 수 있또록 이름을 노출함(Export)
-global kReadCPUID, kSwitchAndExecure64bitkernel
+global kReadCPUID, kSwitchAndExecute64bitKernel
 
 SECTION .text ;text section 정의
 

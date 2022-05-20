@@ -9,7 +9,7 @@
 # 컴파일러 및 링커 정의
 NASM64 = nasm -f elf64
 GCC64 = gcc -c -m64 -ffreestanding
-LD32 = ld -melf_x86_64 -T ../elf_x86_64.x -nostdlib -e Main -Ttext 0x200000
+LD64 = ld -melf_x86_64 -T ../elf_x86_64.x -nostdlib -e Main -Ttext 0x200000
 
 # 바이너리 이미지 생성을 위한 OBJCOPY 옵션 정의
 # -j : section 추철.
@@ -24,7 +24,7 @@ SOURCEDIRECTORY	= Source
 ################################################################################
 # 빌드 항목 및 빌드 방법 설정
 ################################################################################
-all:prepare Kernel64.bin
+all: prepare Kernel64.bin
 
 # 오브젝트 파일이 위치할 디렉터리를 생성
 prepare:
@@ -40,7 +40,7 @@ ExecuteInternalBuild: dep
 	make -C $(OBJECTDIRECTORY) -f ../Makefile Kernel64.elf
 
 # 커널 이미지를 바이너리 파일로 변환
-Kernel64.elf.bin: ExecuteInternalBuild
+Kernel64.bin: ExecuteInternalBuild
 	$(OBJCOPY64) $(OBJECTDIRECTORY)/Kernel64.elf $@
 
 # 소스 파일을 제외한 나머지 파일 정리	
@@ -62,12 +62,8 @@ ASSEMBLYSOURCEFILES = $(wildcard ../$(SOURCEDIRECTORY)/*.asm)
 #***** PRIFRI, 2022.05.16:
 # $(patsubst 수정할패턴, 교체할 패턴, 입력문자열)
 # CSOURCEFILES의 내용에서 .c 확장자를 .o로 변경하겠다는뜻.
-# subst(대상 문자열, 수정할 문자열, 입력문자열)
-#
-# CSOURCEFILES의 c파일들을 o로 교체하고 거기서 Main.o파일은 공백으로 만들겠다는것.
-# Main.o를 무조건 제일 앞에 두고 나머지 뒤로 둘려고 하는 속셈이다.
 #*****
-COBJECTFILES = $(subst Main.o, , $(notdir $(patsubst %.c,%.o,$(CSOURCEFILES))))
+COBJECTFILES = $(notdir $(patsubst %.c,%.o,$(CSOURCEFILES)))
 ASSEMBLYOBJECTFILES = $(notdir $(patsubst %.asm,%.o,$(ASSEMBLYSOURCEFILES)))
 
 $(ENTRYPOINTOBJECTFILE) : $(ENTRYPOINTSOURCEFILE)
@@ -92,12 +88,12 @@ InternalDependency:
 
 # 실제 커널 이미지를 빌드
 #***** PRIFRI, 2022.05.16:
-# CENTRYPOINTOBJECTFILE : Main.o 의 이름만 있따.
+# ENTRYPOINTOBJECTFILE : Main.o 의 이름만 있따.
 # COBJECTFILES : Main.o제외한 것들만 존재한다.
 # 이렇게 하면 제일 앞에 있는 Main.o가 첫위치로 될것이다.
 #*****
-Kernel64.elf: $(CENTRYPOINTOBJECTFILE) $(COBJECTFILES) $(ASSEMBLYOBJECTFILES)
-	$(LD32) -o $@ $^
+Kernel64.elf: $(ENTRYPOINTOBJECTFILE) $(COBJECTFILES) $(ASSEMBLYOBJECTFILES)
+	$(LD64) -o $@ $^
 
 # 현재 디릭토리의 파일 중, dependency 파일이 있으면 make에 포함	
 ifeq (Dependency.dep, $(wildcard Dependency.dep))

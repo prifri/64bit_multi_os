@@ -31,12 +31,9 @@ static void kernel_stop(void)
  */
 bool kInitializeKernel64Area(void)
 {
-#define KERNEL64_START	((uint32_t *)(1024 * 1024 * 1))
-#define KERNEL64_END	((uint32_t *)(1024 * 1024 * 6))
-#define KERNEL64_MAX	((uint32_t *)(1024 * 1024 * 64))
-	uint32_t *start = KERNEL64_START;
+	uint32_t *start = (uint32_t *)KERNEL64_START;
 
-	while (start < KERNEL64_END)
+	while (start < (uint32_t *)KERNEL64_END)
 	{
 		*start = 0;
 		if (*start != 0)
@@ -55,9 +52,9 @@ bool kInitializeKernel64Area(void)
  */
 static bool kIsMemoryEnough(void)
 {
-	uint32_t *start = KERNEL64_START;
+	uint32_t *start = (uint32_t *)KERNEL64_START;
 
-	while (start < KERNEL64_MAX)
+	while (start < (uint32_t *)KERNEL64_MAX)
 	{
 		*start = 0x12345678;
 		if (*start != 0x12345678)
@@ -74,11 +71,11 @@ static bool kIsMemoryEnough(void)
  */
 static void kPrintString( int iX, int iY, const char* pcString )
 {
-    CHARACTER* pstScreen = ( CHARACTER* ) 0xB8000;
+    CHARACTER* pstScreen = ( CHARACTER* )VIDEO_ADDR;
     int i;
     
     // X, Y 좌표를 이용해서 문자열을 출력할 어드레스를 계산
-    pstScreen += ( iY * 80 ) + iX;
+    pstScreen += ( iY * VIDEO_Y_OFFSET ) + iX;
     
     // NULL이 나올 때까지 문자열 출력
     for( i = 0 ; pcString[ i ] != 0 ; i++ )
@@ -112,7 +109,7 @@ static void cpuid_read(void)
 	//*((uint32_t *)vcVendorString + 3) = dwEBX;
 	
 #define CPUID_EXT_REG	(0x80000001)
-	kReadCPUID(0x80000001, &dwEAX, &dwEBX, &dwECX, &dwEDX);
+	kReadCPUID(CPUID_EXT_REG, &dwEAX, &dwEBX, &dwECX, &dwEDX);
     kPrintString( 0, 8, "64bit Mode Support Check....................[    ]");
 	if (dwEDX & ( 1 << 29))
 	{
@@ -126,9 +123,34 @@ static void cpuid_read(void)
 	}
 }
 
+// IA-32e mode kernel을 2MByte address에 copy
+static void kCopyKernel64ImageTo2Mbyte(void)
+{
+	uint16_t wKernel32SectorCount, wTotalKernelSectorCount;
+	uint32_t *pdwSourceAddress, *pdwDestinationAddress;
+	int i;
+
+	// 0x7C05에 총 kernel sector수, 0x7c07에 보호 모드 커널 섹터수가 들어있음
+	wTotalKernelSectorCount = *BOOTLOADER_TOTALSECTORCOUNT_ADDR;
+	wKernel32SectorCount = *BOOTLOADER_KERNEL32SECTORCOUNT_ADDR;
+
+	void *ia32e_image_addr = (void *)(PROTECT_MODE_ADDR +
+		wKernel32SectorCount * SECTOR_SIZE);
+	pdwSourceAddress = ia32e_image_addr;
+	pdwDestinationAddress = (uint32_t *)IA32e_MODE_ADDR;
+
+	for (i = 0; i < SECTOR_SIZE *
+		 (wTotalKernelSectorCount - wKernel32SectorCount) /
+		 (int)sizeof(uint32_t); i++)
+	{
+		*pdwDestinationAddress = *pdwSourceAddress;
+		pdwDestinationAddress++;
+		pdwSourceAddress++;
+	}
+}
 static void __main(void)
 {
-    kPrintString(0, 3, "C Language Kernel Started...................[PASS]");
+    kPrintString(0, 3, "Proctected C Language Kernel Started........[PASS]");
 	kPrintString(0, 4, "Minimum Memory Size Check...................[    ]");
 
 	if (!kIsMemoryEnough())
@@ -160,9 +182,12 @@ static void __main(void)
 
 	cpuid_read();
 
+    kPrintString( 0, 9, "Copy IA-32e Kernel To 2M Address............[    ]");
+	kCopyKernel64ImageTo2Mbyte();
+	kPrintString(45, 9, STR_PASS);
 	// IA-32e mode로 전환
-	kPrintString(0, 9, "Switch To IA-32e Mode");
-	//kSwitchAndExcute64bitKernel();
+	kPrintString(0, 10, "Switch To IA-32e Mode");
+	kSwitchAndExecute64bitKernel();
 stop:
 	kernel_stop();
 }

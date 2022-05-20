@@ -17,6 +17,7 @@ jmp 0x07C0:START    ; CS 세그먼트 레지스터에 0x07C0을 복사하면서,
 ;***** PRIFRI, 2022.05.19:
 ; 아래 두값은 compile후 image maker에서 직접 수정된다. 그러므로 define처럼
 ; 쓰면 안되고 code에서 무조건 해당 변수주소에 직접 접근해서 쓰는식으로해야된다.
+; 위에 jmp 명령어가 5byte를 차지하므로 TOTALSECTORCOUNT는 0x5 address 에 위치한다.
 ;*****
 TOTALSECTORCOUNT:   dw  0x02    ; 부트 로더를 제외한 MINT64 OS 이미지의 크기
                                 ; 최대 1152 섹터(0x90000byte)까지 가능

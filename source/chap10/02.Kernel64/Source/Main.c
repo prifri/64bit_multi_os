@@ -13,7 +13,7 @@ static void __main(void);
  *  아래 함수는 C 언어 커널의 시작 부분임
  *      반드시 다른 함수들 보다 가장 앞쪽에 존재해야 함
  */
-void Main( void )
+void Main(void)
 {
 	__main();
 }
@@ -27,11 +27,11 @@ static void kernel_stop(void)
  */
 static void kPrintString( int iX, int iY, const char* pcString )
 {
-    CHARACTER* pstScreen = ( CHARACTER* ) 0xB8000;
+    CHARACTER* pstScreen = ( CHARACTER* )VIDEO_ADDR;
     int i;
     
     // X, Y 좌표를 이용해서 문자열을 출력할 어드레스를 계산
-    pstScreen += ( iY * 80 ) + iX;
+    pstScreen += ( iY * VIDEO_Y_OFFSET) + iX;
     
     // NULL이 나올 때까지 문자열 출력
     for( i = 0 ; pcString[ i ] != 0 ; i++ )
